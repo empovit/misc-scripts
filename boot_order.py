@@ -36,10 +36,10 @@ def get_name(vm_id):
 def shutdown(vm_name):
     virsh('shutdown', vm_name)
 
-    for _ in range(0, 12):
+    for _ in range(0, 24):
         if virsh('domstate', vm_name) == 'shut off':
             return
-        time.sleep(10)
+        time.sleep(5)
 
     raise TimeoutError(f'Shutting down \'{vm_name}\' took too long')
 
