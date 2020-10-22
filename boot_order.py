@@ -1,5 +1,11 @@
 #!/usr/bin/python3
 
+"""
+This small script changes the boot order of a virsh guest domain.
+It assumes that a guest can be booted from either an HDD or a CD, defines
+the right boot order according to the arguments, and reboots the guest.
+"""
+
 import argparse
 import subprocess
 import time
@@ -10,7 +16,7 @@ import tempfile
 
 def get_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--vm', type=str, help='Domain (VM) name or ID', required=True)
+    parser.add_argument('--vm', type=str, help='Name or ID of a guest domain (VM)', required=True)
     order_group = parser.add_mutually_exclusive_group(required=True)
     order_group.add_argument('--hd', action='store_true', help='Boot from HDD first', default=False)
     order_group.add_argument('--cd', action='store_true', help='Boot from CD first', default=False)
@@ -38,15 +44,17 @@ def shutdown(vm_name):
     raise TimeoutError(f'Shutting down \'{vm_name}\' took too long')
 
 
-def set_order(vm_name, cd_first=False):
+def update_boot_order(definition, cd_first=False):
 
-    definition = virsh('dumpxml', '--inactive', '--security-info', vm_name)
     dom = minidom.parseString(definition)
     os_element = dom.getElementsByTagName('os')[0]
 
     for child in os_element.getElementsByTagName('boot'):
-        if child.getAttribute('dev') in ['cdrom', 'hd']:
+        dev = child.getAttribute('dev')
+        if dev in ['cdrom', 'hd']:
             os_element.removeChild(child)
+        else:
+            raise ValueError(f'Found unexpected boot device: \'{dev}\'')
 
     first = dom.createElement('boot')
     first.setAttribute('dev', 'cdrom' if cd_first else 'hd')
@@ -59,9 +67,13 @@ def set_order(vm_name, cd_first=False):
     return dom.toprettyxml()
 
 
-def define(content):
+def read_definition(vm_name):
+    return virsh('dumpxml', '--inactive', '--security-info', vm_name)
+
+
+def define(definition):
     with tempfile.NamedTemporaryFile() as f:
-        f.write(content.encode())
+        f.write(definition.encode())
         f.seek(0)
         virsh('define', f.name)
 
@@ -75,9 +87,11 @@ if __name__ == '__main__':
     try:
         vm = get_name(args.vm) if args.vm.isdigit() else args.vm
         shutdown(vm)
-        xml = set_order(vm, args.cd)
-        define(xml)
+        old_def = read_definition(vm)
+        new_def = update_boot_order(old_def, args.cd)
+        define(new_def)
         boot(vm)
+        print('Done')
     except Exception as e:
         print(e, file=sys.stderr)
         exit(1)
