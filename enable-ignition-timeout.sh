@@ -3,6 +3,16 @@
 #############################################################################################
 # Usage:
 #   CLUSTER=<uuid> [BEARER=<token>] [BASE_URL=<url>] ./enable-ignition-timeout.sh
+#
+# If downloading ingition times out (see 'httpTotal', in seconds), 
+# press 'Enter' when prompted to drop into shell.
+#   
+# Diagnostics info:
+# - less /run/initramfs/rdsosreport.txt
+# - journalctl -a
+# - dmesg
+# - less /run/initramfs/init.log
+# - ip address
 #############################################################################################
 
 BASE_URL=${BASE_URL:-"https://api.openshift.com/"}
