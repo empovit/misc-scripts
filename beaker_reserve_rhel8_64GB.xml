@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  This Beaker (https://beaker-project.org/) job reserves a physical x86 machine
+  with 64+ GB RAM, and installs RHEL 8.x on it
+-->
+<job retention_tag="scratch">
+  <whiteboard>Reserve RHEL 8, &gt;64 GB</whiteboard>
+  <recipeSet priority="High">
+    <recipe whiteboard="" role="RECIPE_MEMBERS" ks_meta="" kernel_options="" kernel_options_post="">
+      <autopick random="false"/>
+      <watchdog panic="ignore"/>
+      <packages/>
+      <ks_appends/>
+      <repos/>
+      <distroRequires>
+        <and>
+          <distro_family op="=" value="RedHatEnterpriseLinux8"/>
+          <distro_variant op="=" value="BaseOS"/>
+          <distro_name op="=" value="RHEL-8.2.0"/>
+          <distro_arch op="=" value="x86_64"/>
+        </and>
+      </distroRequires>
+      <hostRequires>
+        <and>
+          <arch op="=" value="x86_64"/>
+          <hypervisor op="=" value=""/>
+          <system_type op="=" value="Machine"/>
+          <memory op="&gt;" value="64000"/>
+          <diskspace op="&gt;" value="80000"/>
+        </and>
+      </hostRequires>
+      <partitions/>
+      <task name="/distribution/check-install" role="STANDALONE"/>
+      <task name="/distribution/reservesys" role="STANDALONE">
+        <params>
+          <param name="RESERVETIME" value="356400"/>
+        </params>
+      </task>
+    </recipe>
+  </recipeSet>
+</job>
