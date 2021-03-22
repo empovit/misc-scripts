@@ -4,6 +4,8 @@
 # Usage:
 #   CLUSTER=<uuid> [BEARER=<token>] [BASE_URL=<url>] ./enable-ignition-timeout.sh
 #
+# How to get a bearer token https://github.com/openshift/assisted-service/blob/master/docs/cloud.md
+#
 # If downloading ingition times out (see 'httpTotal', in seconds),
 # press 'Enter' when prompted to drop into shell.
 #

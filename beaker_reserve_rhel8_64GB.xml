@@ -4,7 +4,7 @@
   with 64+ GB RAM, and installs RHEL 8.x on it
 -->
 <job retention_tag="scratch">
-  <whiteboard>Reserve RHEL 8, &gt;64 GB</whiteboard>
+  <whiteboard>Reserve RHEL 8.2, RAM 64+ GB</whiteboard>
   <recipeSet priority="High">
     <recipe whiteboard="" role="RECIPE_MEMBERS" ks_meta="" kernel_options="" kernel_options_post="">
       <autopick random="false"/>
